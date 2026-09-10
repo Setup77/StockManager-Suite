@@ -1,0 +1,17 @@
+stock-api/
+├── bin/            ──> [Pattern CLI / Console] Points d'entrée des commandes
+├── config/         ──> [Pattern Centralisation] Configuration globale du framework
+├── public/         ──> [Pattern Front Controller] Unique point d'entrée HTTP
+├── src/            ──> [Pattern Architecture en Couches / MVC] Votre code métier
+├── var/            ──> [Pattern Zone Tampon] Données volatiles et temporaires
+└── vendor/         ──> [Pattern Gestion de Dépendances] Bibliothèques tierces
+
+{
+  "username": "admin@stock.com",
+  "password": "password123"
+}
+
+
+
+
+

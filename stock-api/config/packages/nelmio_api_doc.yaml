@@ -1,0 +1,19 @@
+# config/packages/nelmio_api_doc.yaml
+nelmio_api_doc:
+    documentation:
+        info:
+            title: API REST de Gestion de Stock
+            description: Documentation interactive du portfolio d'entreprise. Stock, Catégories et Authentification JWT.
+            version: 1.0.0
+        components:
+            securitySchemes:
+                BearerAuth:
+                    type: apiKey
+                    in: header
+                    name: Authorization
+                    description: "Saisissez votre jeton sous la forme : Bearer <votre_token>"
+        security:
+            - BearerAuth: []
+    areas: # Limiter la documentation aux routes commençant par /api
+        path_patterns:
+            - ^/api(?!/doc$)

@@ -1,0 +1,60 @@
+security:
+    # 1. Hachage des mots de passe (par défaut auto/bcrypt/argon2)
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
+
+    # 2. Fournisseur de données (Où aller chercher les utilisateurs ?)
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    # 3. Les Pare-feux (Firewalls)
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # Zone d'authentification : Route pour récupérer le jeton JWT
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        # Zone d'API : Toutes les autres routes requièrent le jeton JWT
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~
+
+        # 4. Règles de contrôle d'accès (Access Control) - ORDRE CRITIQUE
+    access_control:
+        # [1] Autoriser tout le monde à créer un compte et à s'authentifier
+        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
+
+        # [2] PRIVILÈGES PUBLICS (Placés AVANT la barrière globale)
+        # Autorise n'importe quel visiteur anonyme à faire un GET sur les listes pour la page Home
+        - { path: ^/api/products, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/categories, roles: PUBLIC_ACCESS, methods: [GET] }
+
+        # [3] SÉCURISATION DES MODIFICATIONS
+        # Impose d'avoir le rôle collaborateur pour modifier la base de données (POST, PUT, DELETE)
+        - {
+              path: ^/api/products,
+              roles: ROLE_USER,
+              methods: [POST, PUT, DELETE],
+          }
+        - {
+              path: ^/api/categories,
+              roles: ROLE_USER,
+              methods: [POST, PUT, DELETE],
+          }
+
+        # [4] LA BARRIÈRE GLOBALE DE SÉCURITÉ (Placée en dernier recours)
+        # Tout le reste de l'API non listé ci-dessus requiert une authentification stricte
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
